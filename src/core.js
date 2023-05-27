@@ -62,12 +62,14 @@ class Conversion {
   UTIL = new Util();
   STYLEPATH = __dirname + "/static/styles.xml";
   DOCXPATH = __dirname + "/../docx";
-  DOCXFILEPATH = "";
+  DOCXFILEPATH = ""
+  SUCCESS = false;
 
   ARTICLESTRING = "";
   ARTICLEJSON = {};
 
   ARTICLE = {
+    id: 0,
     title: {},
     author: {},
     content: {},
@@ -80,14 +82,24 @@ class Conversion {
   }
 
   async start() {
-    await this.UTIL.extractHtmlFromUrl(this.URL).then(
-      (htmlString) => {
-        this.ARTICLESTRING = htmlString;
-        this.initializationArticleData();
-        this.createDocxPath();
-        this.DOCXFILEPATH = `${this.DOCXPATH}/${this.ARTICLE.title}.docx`;
-      }
-    )
+    try {
+      this.SUCCESS = false;
+      await this.UTIL.extractHtmlFromUrl(this.URL).then(
+        async (htmlString) => {
+          this.ARTICLESTRING = htmlString;
+          this.createDocxPath();
+          await this.initializationArticleData().then(()=>{
+            this.createDocument().then(()=>{
+              this.DOCXFILEPATH = `${this.DOCXPATH}/${this.ARTICLE.title}.docx`;
+              this.SUCCESS = true;
+              this.printDocxLog();
+            })
+          });
+        }
+      )
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   // 创建文档存储文件夹
@@ -107,16 +119,11 @@ class Conversion {
   }
 
   // 初始化文章数据
-  initializationArticleData() {
+  async initializationArticleData() {
     this.extractDataJsonFromHtml();
     this.initializationArticleConstant();
     this.printArticleLog();
-    this.initializationParagraphsConstant().then(
-      () => {
-        this.createDocument();
-        this.printDocxLog();
-      }
-    );
+    await this.initializationParagraphsConstant()
   };
 
   // 判断是否是简篇的文章
@@ -130,7 +137,6 @@ class Conversion {
 
   // 从 HTML 中提取文章的 JSON 格式信息
   extractDataJsonFromHtml() {
-    try {
       const $ = Cheerio.load(this.ARTICLESTRING);
       var scriptText = $("script").text();
       var dataSting = "";
@@ -148,13 +154,11 @@ class Conversion {
         )
       }
       this.ARTICLEJSON = JSON.parse(dataSting);
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   // 设置 ARTICLE 常量的值
-  setArticleConstant(title, author, content) {
+  setArticleConstant(id, title, author, content) {
+    this.ARTICLE.id = id;
     this.ARTICLE.title = title;
     this.ARTICLE.author = author;
     this.ARTICLE.content = content;
@@ -164,6 +168,7 @@ class Conversion {
   initializationArticleConstant() {
     if (this.isJianPian()) {
       this.setArticleConstant(
+        this.ARTICLEJSON.detail.article.mask_id,
         this.ARTICLEJSON.detail.article.title,
         this.ARTICLEJSON.users.author.nickname,
         this.ARTICLEJSON.detail.article.content,
@@ -171,6 +176,7 @@ class Conversion {
 
     } else {
       this.setArticleConstant(
+        this.ARTICLEJSON.article.mask_id,
         this.ARTICLEJSON.article.title,
         this.ARTICLEJSON.author.nickname,
         this.ARTICLEJSON.content
@@ -219,7 +225,7 @@ class Conversion {
   }
 
   // 创建文档
-  createDocument() {
+  async createDocument() {
     const docx = new Docx.Document({
       externalStyles: Fs.readFileSync(this.STYLEPATH, "utf-8"),
       sections: [{
