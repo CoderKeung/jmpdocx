@@ -78,6 +78,7 @@ class Conversion {
   constructor(url) {
     this.URL = url;
   }
+
   async start() {
     await this.UTIL.extractHtmlFromUrl(this.URL).then(
       (htmlString) => {

@@ -1,12 +1,11 @@
 const loadGif = '<img src="loading.gif" id="loadGif" class="loadGif" alt="loading">'
 $("#submitBtn").click(function () {
-  $(".workArea").after(loadGif)
+  $(".workArea").after("<p>加载中</p>")
   $.get(
     "/deal",
     { url: $("#url").val() },
     (data) => {
       const jsonData = JSON.parse(data)
-      $("#loadGif").remove();
       var title = (jsonData.title.length >= 28) ? jsonData.title.substring(0,28) + "……" : jsonData.title
       $("#docxArea").append(`
       <div class="docxItem">
