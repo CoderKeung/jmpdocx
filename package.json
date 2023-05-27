@@ -1,0 +1,14 @@
+{
+  "name": "jmpdocx",
+  "version": "1.0.0",
+  "description": "将简篇或美篇的文章转换成Word。",
+  "author": "CoderKeung",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "docx": "^8.0.4",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  }
+}
