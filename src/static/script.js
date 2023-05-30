@@ -8,10 +8,9 @@ function isUrl(url) {
 
 function extractMaskIdFromUrl(url) {
   if (isUrl(url)) {
-    var urlArray = url.split("/");
-    var lastArray = urlArray[urlArray.length - 1];
-    var mask_id = (lastArray.lastIndexOf("?") == -1) ? lastArray : lastArray.substring(0, lastArray.lastIndexOf("?")) 
-    return mask_id
+    let urlArray = url.split("/");
+    let lastArray = urlArray[urlArray.length - 1];
+    return (lastArray.lastIndexOf("?") === -1) ? lastArray : lastArray.substring(0, lastArray.lastIndexOf("?"))
   } else {
     return false
   }
@@ -27,8 +26,8 @@ function maskIdInArray(maskId, array) {
 }
 
 $("#submitBtn").click(function () {
-  var value = $("#url").val();
-  var mask_id = extractMaskIdFromUrl(value);
+  let value = $("#url").val();
+  let mask_id = extractMaskIdFromUrl(value);
   if (mask_id) {
     lock = maskIdInArray(mask_id, articleArray)
   }

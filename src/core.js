@@ -47,11 +47,7 @@ class Util {
 
   isSpecificDomain(url, domain) {
     const urlArray = url.split('/')
-    if (urlArray[2] === domain) {
-      return true;
-    } else {
-      return false;
-    }
+    return urlArray[2] === domain;
   }
 
 }
@@ -128,18 +124,14 @@ class Conversion {
 
   // 判断是否是简篇的文章
   isJianPian() {
-    if (this.UTIL.isSpecificDomain(this.URL, "www.jianpian.cn")) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.UTIL.isSpecificDomain(this.URL, "www.jianpian.cn");
   }
 
   // 从 HTML 中提取文章的 JSON 格式信息
   extractDataJsonFromHtml() {
       const $ = Cheerio.load(this.ARTICLESTRING);
-      var scriptText = $("script").text();
-      var dataSting = "";
+      let scriptText = $("script").text();
+      let dataSting = "";
       if (this.isJianPian()) {
         dataSting = this.UTIL.extractTextAndReturnRemainder(
           scriptText,
